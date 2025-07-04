@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Squid Game Minecraft - Cool Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Orbitron', sans-serif;
+    background: #000;
+    overflow: hidden;
+    color: #e50914;
+  }
+  .background-video {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: -10;
+    filter: brightness(0.15) contrast(1.5);
+  }
+  .overlay {
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.7);
+    z-index: -5;
+  }
+  .content {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    max-width: 400px;
+    width: 90vw;
+  }
+  h1 {
+    font-size: 4.5rem;
+    margin: 0 0 40px;
+    text-shadow:
+      0 0 6px #ff0000,
+      0 0 20px #e50914,
+      0 0 30px #ff0000,
+      0 0 40px #ff3333,
+      0 0 70px #ff1a1a;
+    animation: glitch 2s infinite;
+  }
+  @keyframes glitch {
+    0% {
+      text-shadow:
+        2px 0 red,
+        -2px 0 cyan,
+        0 0 10px #ff0000;
+    }
+    20% {
+      text-shadow:
+        -2px 0 red,
+        2px 0 cyan,
+        0 0 10px #e50914;
+    }
+    40% {
+      text-shadow:
+        2px 2px red,
+        -2px -2px cyan,
+        0 0 20px #ff3333;
+    }
+    60% {
+      text-shadow:
+        -2px -2px red,
+        2px 2px cyan,
+        0 0 20px #ff1a1a;
+    }
+    80% {
+      text-shadow:
+        2px 0 red,
+        -2px 0 cyan,
+        0 0 10px #ff0000;
+    }
+    100% {
+      text-shadow:
+        -2px 0 red,
+        2px 0 cyan,
+        0 0 10px #e50914;
+    }
+  }
+  button {
+    cursor: pointer;
+    font-size: 2rem;
+    color: #fff;
+    background: transparent;
+    border: 3px solid #e50914;
+    border-radius: 50px;
+    padding: 20px 60px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    box-shadow:
+      0 0 10px #e50914,
+      0 0 30px #ff0000;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  button:hover {
+    color: #ff3333;
+    box-shadow:
+      0 0 20px #ff0000,
+      0 0 50px #ff1a1a,
+      0 0 70px #ff4d4d;
+    transform: scale(1.1);
+  }
+  button:active {
+    transform: scale(0.95);
+  }
+  .code-box {
+    margin-top: 50px;
+    font-size: 6rem;
+    letter-spacing: 15px;
+    color: #ff1a1a;
+    text-shadow:
+      0 0 10px #ff1a1a,
+      0 0 40px #ff4d4d;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .visible {
+    opacity: 1;
+    transform: scale(1);
+    animation: pulse 1.5s infinite alternate;
+  }
+  @keyframes pulse {
+    0% { text-shadow: 0 0 20px #ff4d4d; }
+    100% { text-shadow: 0 0 40px #ff0000; }
+  }
+  .rules {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 280px;
+    background: rgba(255, 0, 0, 0.2);
+    border: 2px solid #ff1a1a;
+    padding: 15px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+    text-align: left;
+    box-shadow: 0 0 10px #ff1a1a;
+    font-weight: 700;
+    z-index: 100;
+    user-select: none;
+  }
+  .rules strong {
+    color: #ff4d4d;
+  }
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 2.8rem;
+    }
+    .code-box {
+      font-size: 3.5rem;
+      letter-spacing: 10px;
+    }
+    button {
+      font-size: 1.5rem;
+      padding: 15px 40px;
+    }
+    .rules {
+      width: 90vw;
+      bottom: 10px;
+      right: 5vw;
+      font-size: 0.8rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background video -->
+<video class="background-video" autoplay muted loop>
+  <source src="https://cdn.coverr.co/videos/coverr-red-dust-9966/1080p.mp4" type="video/mp4" />
+</video>
+<div class="overlay"></div>
+
+<div class="content">
+  <h1>Squid Game<br />Minecraft</h1>
+  <button id="play">PLAY</button>
+  <div class="code-box" id="code"></div>
+</div>
+
+<!-- YouTube player container (hidden) -->
+<div id="player" style="display:none;"></div>
+
+<!-- Rules box -->
+<div class="rules">
+  <strong>Reguli:</strong><br />
+  1. Apasă PLAY pentru a genera un cod.<br />
+  2. Codul este unic și trebuie păstrat.<br />
+  3. Trimite codul Managerului <strong>ZeeZeron</strong> pentru a intra în joc.<br />
+  4. Doar participanții cu cod valid pot accesa serverul.<br />
+  5. Distracție plăcută și fii atent la pași!<br />
+</div>
+
+<script>
+  const button = document.getElementById("play");
+  const codeBox = document.getElementById("code");
+
+  function generateCode() {
+    return Math.floor(1000 + Math.random() * 9000);
+  }
+
+  button.addEventListener("click", () => {
+    let code = localStorage.getItem("squid_game_code");
+    if (!code) {
+      code = generateCode();
+      localStorage.setItem("squid_game_code", code);
+    }
+    codeBox.textContent = code;
+    codeBox.classList.add("visible");
+  });
+
+  window.addEventListener("load", () => {
+    const existingCode = localStorage.getItem("squid_game_code");
+    if (existingCode) {
+      codeBox.textContent = existingCode;
+      codeBox.classList.add("visible");
+    }
+  });
+</script>
+
+<!-- YouTube IFrame API -->
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+  let player;
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+      height: '0',
+      width: '0',
+      videoId: 'xS1J1vynnaU',
+      playerVars: {
+        autoplay: 1,
+        loop: 1,
+        playlist: 'xS1J1vynnaU',
+        controls: 0,
+        modestbranding: 1,
+        mute: 0,
+      },
+      events: {
+        'onReady': (event) => {
+          event.target.setVolume(15); // volum redus la 15%
+          event.target.playVideo();
+        }
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
