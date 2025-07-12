@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZeeHUB Server Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-green: #00ff9c;
+      --neon-orange: #ff7300;
+      --bg-dark: #0b0f19;
+      --glass: rgba(255, 255, 255, 0.05);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: radial-gradient(circle at top left, #0f0c29, #302b63, #24243e);
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-attachment: fixed;
+    }
+
+    h1 {
+      color: var(--neon-green);
+      text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-orange);
+      margin-bottom: 30px;
+      font-size: 3rem;
+    }
+
+    .container {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      width: 95%;
+      max-width: 1000px;
+      box-shadow: 0 0 25px var(--neon-green);
+    }
+
+    .status {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: var(--neon-orange);
+    }
+
+    .players {
+      margin-bottom: 20px;
+      background-color: rgba(0, 255, 156, 0.1);
+      padding: 10px;
+      border-radius: 15px;
+    }
+
+    .players ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .players li {
+      margin: 5px 0;
+      font-size: 1.2rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 5px 10px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .command-section {
+      margin-top: 30px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    button {
+      padding: 12px;
+      background: linear-gradient(45deg, var(--neon-green), var(--neon-orange));
+      border: none;
+      border-radius: 30px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 10px var(--neon-orange);
+    }
+
+    button:hover {
+      background: linear-gradient(45deg, var(--neon-orange), var(--neon-green));
+      color: #fff;
+    }
+
+    input[type="text"] {
+      padding: 12px;
+      border: none;
+      border-radius: 25px;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 20px;
+      font-size: 1rem;
+    }
+
+    #output {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 12px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+      color: var(--neon-green);
+    }
+  </style>
+</head>
+<body>
+  <h1>ZeeHUB RGB Panel</h1>
+  <div class="container">
+    <div class="status" id="status">Loading server status...</div>
+    <div class="players" id="players">
+      <strong>Online players:</strong>
+      <ul id="playerList">
+        <li>Loading players...</li>
+      </ul>
+    </div>
+
+    <div class="command-section">
+      <h2>Comenzi rapide</h2>
+      <div class="grid">
+        <button onclick="sendCommand('list')">/list</button>
+        <button onclick="sendCommand('stop')">/stop</button>
+        <button onclick="sendCommand('say Hello!')">/say Hello</button>
+        <button onclick="sendCommand('time set day')">/time set day</button>
+        <button onclick="sendCommand('time set night')">/time set night</button>
+        <button onclick="sendCommand('weather clear')">/weather clear</button>
+        <button onclick="sendCommand('weather rain')">/weather rain</button>
+        <button onclick="sendCommand('weather thunder')">/weather thunder</button>
+      </div>
+
+      <input type="text" id="customCommand" placeholder="Scrie o comandă Minecraft...">
+      <button onclick="customSend()">Trimite comandă</button>
+
+      <div id="output"></div>
+    </div>
+  </div>
+
+  <script>
+    const emojis = ['😎','🎮','🔥','💥','⚡','🧠','🐉','🧊','👾','🚀','🛡️','⚔️','💎'];
+
+    async function fetchStatus() {
+      const statusEl = document.getElementById('status');
+      const listEl = document.getElementById('playerList');
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        if (data.status === 'online') {
+          statusEl.textContent = '🟢 Server online';
+          const players = data.players.split(':')[1]?.split(',') || [];
+          listEl.innerHTML = '';
+          if (players.length > 0 && players[0].trim() !== '') {
+            players.forEach(p => {
+              const li = document.createElement('li');
+              const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+              li.textContent = `${emoji} ${p.trim()}`;
+              listEl.appendChild(li);
+            });
+          } else {
+            listEl.innerHTML = '<li>Niciun jucător online</li>';
+          }
+        } else {
+          statusEl.textContent = '🔴 Server offline';
+          listEl.innerHTML = '<li>Offline</li>';
+        }
+      } catch (err) {
+        statusEl.textContent = '🔴 Server offline (eroare)';
+        listEl.innerHTML = '<li>Nu s-a putut încărca</li>';
+      }
+    }
+
+    async function sendCommand(cmd) {
+      const out = document.getElementById('output');
+      out.textContent = 'Se trimite comanda...';
+      try {
+        const res = await fetch('/api/command', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ command: cmd })
+        });
+        const data = await res.json();
+        if (res.ok) out.textContent = `✔️ ${data.result}`;
+        else out.textContent = `❌ ${data.error}`;
+        if (cmd === 'list') fetchStatus();
+      } catch (err) {
+        out.textContent = '❌ Eroare la conexiune cu serverul';
+      }
+    }
+
+    function customSend() {
+      const input = document.getElementById('customCommand');
+      const cmd = input.value.trim();
+      if (!cmd) return alert('Introdu o comandă!');
+      sendCommand(cmd);
+      input.value = '';
+    }
+
+    fetchStatus();
+    setInterval(fetchStatus, 15000);
+  </script>
+</body>
+</html>
