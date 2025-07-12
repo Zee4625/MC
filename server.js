@@ -1,14 +1,14 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');           // adaugă asta
+const path = require('path');
 const { Rcon } = require('rcon-client');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servește fișiere statice (ex: index.html)
-app.use(express.static(path.join(__dirname)));
+// Servește fișierele din folderul public/
+app.use(express.static(path.join(__dirname, 'public')));
 
 const RCON_HOST = '191.96.231.11';
 const RCON_PORT = 25575;
