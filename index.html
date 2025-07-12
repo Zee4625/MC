@@ -3,104 +3,166 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZeeHUB - Minecraft RCON Panel</title>
+  <title>ZeeHUB - Minecraft Server Panel</title>
   <style>
-    body {
-      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg-color: #0d0d0d;
+      --panel-color: #1a1a1a;
+      --primary: #00ff88;
+      --accent: #ffaa33;
+      --text: #ffffff;
+      --error: #ff4444;
     }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-color);
+      color: var(--text);
+    }
+
     header {
-      background: #0f0f0f;
+      background: var(--panel-color);
       padding: 20px;
       text-align: center;
-      box-shadow: 0 0 15px limegreen;
+      box-shadow: 0 0 20px var(--primary);
     }
-    h1 {
-      font-size: 2.5rem;
-      color: limegreen;
-      text-shadow: 0 0 10px orange;
+
+    header h1 {
+      font-size: 2.8rem;
+      color: var(--primary);
+      text-shadow: 0 0 10px var(--accent);
     }
-    .section {
+
+    main {
+      max-width: 1000px;
       margin: 30px auto;
       padding: 20px;
-      max-width: 900px;
-      background: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 10px;
-      box-shadow: 0 0 20px #0f0;
     }
-    .section h2 {
-      color: orange;
+
+    section {
+      background: var(--panel-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 0 10px var(--primary);
+    }
+
+    section h2 {
+      color: var(--accent);
       margin-bottom: 10px;
     }
-    #playerList span {
-      display: inline-block;
-      margin: 5px;
-      padding: 5px 10px;
-      background: #2b2b2b;
-      border-radius: 8px;
-      box-shadow: 0 0 5px limegreen;
+
+    #serverStatus {
+      font-size: 1.2rem;
+      margin: 10px 0;
     }
+
+    #playerList span {
+      background: #222;
+      padding: 8px 12px;
+      margin: 4px;
+      display: inline-block;
+      border-radius: 8px;
+      box-shadow: 0 0 5px var(--primary);
+    }
+
     input, button, select {
-      padding: 10px;
+      background: #222;
       border: none;
-      border-radius: 5px;
-      margin: 5px;
-      background: #333;
-      color: white;
+      color: var(--text);
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 8px;
       font-size: 1rem;
     }
-    button:hover {
-      background: limegreen;
+
+    button {
+      background-color: var(--primary);
+      color: #000;
+      font-weight: bold;
       cursor: pointer;
+      transition: 0.3s;
     }
+
+    button:hover {
+      background-color: var(--accent);
+    }
+
+    .button-group button {
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
     #consoleOutput {
-      background: black;
-      color: #0f0;
-      font-family: monospace;
-      padding: 10px;
-      height: 150px;
+      background: #111;
+      height: 200px;
       overflow-y: auto;
-      border-radius: 5px;
+      padding: 10px;
+      font-family: monospace;
+      border-radius: 8px;
+      border: 1px solid #333;
+      white-space: pre-wrap;
+      color: var(--primary);
     }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🌐 ZeeHUB - Minecraft Server Panel</h1>
+    <h1>⚡ ZeeHUB - Minecraft Server Control</h1>
   </header>
 
-  <div class="section" id="statusSection">
-    <h2>🖥️ Server Status</h2>
-    <p id="serverStatus">Checking...</p>
-    <div id="playerList"></div>
-  </div>
+  <main>
+    <section id="statusSection">
+      <h2>🖥️ Server Status</h2>
+      <p id="serverStatus">Loading...</p>
+      <div id="playerList"></div>
+    </section>
 
-  <div class="section" id="commandsSection">
-    <h2>📟 Console Commands</h2>
-    <input type="text" id="commandInput" placeholder="Enter RCON command..." />
-    <button onclick="sendCommand()">Send</button>
-    <div>
-      <button onclick="quickCommand('say Hello from ZeeHUB!')">💬 Say</button>
-      <button onclick="quickCommand('list')">👥 List Players</button>
-      <button onclick="quickCommand('time set day')">🌞 Day</button>
-      <button onclick="quickCommand('kill @e[type=!player]')">💥 Kill Mobs</button>
-      <button onclick="quickCommand('tp @a 0 100 0')">📍 Teleport All</button>
-    </div>
-    <div id="consoleOutput">Console output will appear here...</div>
-  </div>
+    <section id="consoleSection">
+      <h2>⌨️ Console</h2>
+      <input type="text" id="commandInput" placeholder="Enter command..." />
+      <button onclick="sendCommand()">Send</button>
+      <div class="button-group">
+        <button onclick="quickCommand('say Server managed by ZeeHUB!')">💬 Broadcast</button>
+        <button onclick="quickCommand('list')">📜 List</button>
+        <button onclick="quickCommand('time set night')">🌙 Night</button>
+        <button onclick="quickCommand('weather clear')">☀️ Clear Weather</button>
+        <button onclick="quickCommand('tp @a 0 100 0')">🧭 TP All</button>
+        <button onclick="quickCommand('kill @e[type=!player]')">💥 Kill All Mobs</button>
+      </div>
+      <div id="consoleOutput">Console output...</div>
+    </section>
 
-  <div class="section" id="pluginsSection">
-    <h2>🔌 Plugins</h2>
-    <p>Plugins section coming soon! (or add via commands)</p>
-  </div>
+    <section id="pluginsSection">
+      <h2>🔌 Plugins (Vizual)</h2>
+      <ul>
+        <li>EssentialsX - ✅ Installed</li>
+        <li>LuckPerms - ✅ Installed</li>
+        <li>WorldEdit - ⏳ Coming Soon</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    ZeeHUB © 2025. Futuristic Minecraft Panel.
+  </footer>
 
   <script>
-    const emojis = ["😎", "👾", "🧠", "🦾", "🎮", "👽", "🔥", "⚡", "💣"];
+    const emojis = ["😎", "👾", "🧠", "🦾", "🎮", "👽", "🔥", "⚡", "💣", "🤖"];
 
     function getRandomEmoji() {
       return emojis[Math.floor(Math.random() * emojis.length)];
@@ -111,24 +173,22 @@
         const res = await fetch('http://localhost:3000/api/status');
         const data = await res.json();
         if (data.status === 'online') {
-          document.getElementById('serverStatus').innerText = '🟢 Server is ONLINE';
-          const match = data.players.match(/There are \d+ of a max \d+ players online: (.+)/);
-          const playerList = match ? match[1].split(', ') : [];
-          document.getElementById('playerList').innerHTML = playerList
-            .map(p => `<span>${getRandomEmoji()} ${p}</span>`)
-            .join('');
+          document.getElementById('serverStatus').innerHTML = '✅ Online';
+          const match = data.players.match(/players online: (.+)/);
+          const players = match ? match[1].split(', ') : [];
+          document.getElementById('playerList').innerHTML = players.map(p => `<span>${getRandomEmoji()} ${p}</span>`).join('');
         } else {
-          document.getElementById('serverStatus').innerText = '🔴 Server is OFFLINE';
+          document.getElementById('serverStatus').innerHTML = '❌ Offline';
         }
-      } catch (err) {
-        document.getElementById('serverStatus').innerText = '❌ Error connecting to server';
+      } catch (e) {
+        document.getElementById('serverStatus').innerHTML = '⚠️ Error connecting to server';
       }
     }
 
     async function sendCommand() {
-      const command = document.getElementById('commandInput').value;
-      if (!command) return;
-      await quickCommand(command);
+      const cmd = document.getElementById('commandInput').value;
+      if (!cmd) return;
+      await quickCommand(cmd);
     }
 
     async function quickCommand(cmd) {
@@ -139,14 +199,14 @@
           body: JSON.stringify({ command: cmd }),
         });
         const data = await res.json();
-        document.getElementById('consoleOutput').innerText += `> ${cmd}\n${data.result}\n\n`;
+        document.getElementById('consoleOutput').textContent += `> ${cmd}\n${data.result || data.error}\n\n`;
       } catch (err) {
-        document.getElementById('consoleOutput').innerText += `> ${cmd}\nError: ${err.message}\n\n`;
+        document.getElementById('consoleOutput').textContent += `> ${cmd}\n❌ ${err.message}\n\n`;
       }
     }
 
     fetchStatus();
-    setInterval(fetchStatus, 10000); // update every 10s
+    setInterval(fetchStatus, 10000);
   </script>
 
 </body>
