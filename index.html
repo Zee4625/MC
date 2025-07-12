@@ -1,212 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZeeHUB - Minecraft Server Panel</title>
+  <title>RCON Minecraft Console</title>
   <style>
-    :root {
-      --bg-color: #0d0d0d;
-      --panel-color: #1a1a1a;
-      --primary: #00ff88;
-      --accent: #ffaa33;
-      --text: #ffffff;
-      --error: #ff4444;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg-color);
-      color: var(--text);
-    }
-
-    header {
-      background: var(--panel-color);
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 0 20px var(--primary);
-    }
-
-    header h1 {
-      font-size: 2.8rem;
-      color: var(--primary);
-      text-shadow: 0 0 10px var(--accent);
-    }
-
-    main {
-      max-width: 1000px;
-      margin: 30px auto;
-      padding: 20px;
-    }
-
-    section {
-      background: var(--panel-color);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 30px;
-      box-shadow: 0 0 10px var(--primary);
-    }
-
-    section h2 {
-      color: var(--accent);
-      margin-bottom: 10px;
-    }
-
-    #serverStatus {
-      font-size: 1.2rem;
-      margin: 10px 0;
-    }
-
-    #playerList span {
-      background: #222;
-      padding: 8px 12px;
-      margin: 4px;
-      display: inline-block;
-      border-radius: 8px;
-      box-shadow: 0 0 5px var(--primary);
-    }
-
-    input, button, select {
-      background: #222;
-      border: none;
-      color: var(--text);
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-
-    button {
-      background-color: var(--primary);
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background-color: var(--accent);
-    }
-
-    .button-group button {
-      margin-right: 10px;
-      margin-bottom: 10px;
-    }
-
-    #consoleOutput {
-      background: #111;
-      height: 200px;
-      overflow-y: auto;
-      padding: 10px;
-      font-family: monospace;
-      border-radius: 8px;
-      border: 1px solid #333;
-      white-space: pre-wrap;
-      color: var(--primary);
-    }
-
-    footer {
-      text-align: center;
-      padding: 15px;
-      font-size: 0.9rem;
-      color: #555;
-    }
-
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #output { white-space: pre-wrap; background: #222; color: #eee; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 10px; }
+    input[type="text"] { width: 80%; padding: 8px; }
+    button { padding: 8px 16px; }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>⚡ ZeeHUB - Minecraft Server Control</h1>
-  </header>
-
-  <main>
-    <section id="statusSection">
-      <h2>🖥️ Server Status</h2>
-      <p id="serverStatus">Loading...</p>
-      <div id="playerList"></div>
-    </section>
-
-    <section id="consoleSection">
-      <h2>⌨️ Console</h2>
-      <input type="text" id="commandInput" placeholder="Enter command..." />
-      <button onclick="sendCommand()">Send</button>
-      <div class="button-group">
-        <button onclick="quickCommand('say Server managed by ZeeHUB!')">💬 Broadcast</button>
-        <button onclick="quickCommand('list')">📜 List</button>
-        <button onclick="quickCommand('time set night')">🌙 Night</button>
-        <button onclick="quickCommand('weather clear')">☀️ Clear Weather</button>
-        <button onclick="quickCommand('tp @a 0 100 0')">🧭 TP All</button>
-        <button onclick="quickCommand('kill @e[type=!player]')">💥 Kill All Mobs</button>
-      </div>
-      <div id="consoleOutput">Console output...</div>
-    </section>
-
-    <section id="pluginsSection">
-      <h2>🔌 Plugins (Vizual)</h2>
-      <ul>
-        <li>EssentialsX - ✅ Installed</li>
-        <li>LuckPerms - ✅ Installed</li>
-        <li>WorldEdit - ⏳ Coming Soon</li>
-      </ul>
-    </section>
-  </main>
-
-  <footer>
-    ZeeHUB © 2025. Futuristic Minecraft Panel.
-  </footer>
+  <h1>Consolă Minecraft RCON</h1>
+  <div id="output">Status: conectare...</div>
+  <input type="text" id="command" placeholder="Introdu comandă..." />
+  <button onclick="sendCommand()">Trimite</button>
 
   <script>
-    const emojis = ["😎", "👾", "🧠", "🦾", "🎮", "👽", "🔥", "⚡", "💣", "🤖"];
+    const output = document.getElementById('output');
+    const commandInput = document.getElementById('command');
 
-    function getRandomEmoji() {
-      return emojis[Math.floor(Math.random() * emojis.length)];
-    }
-
-    async function fetchStatus() {
+    async function updateStatus() {
       try {
-        const res = await fetch('http://localhost:3000/api/status');
+        const res = await fetch('/api/status');
         const data = await res.json();
-        if (data.status === 'online') {
-          document.getElementById('serverStatus').innerHTML = '✅ Online';
-          const match = data.players.match(/players online: (.+)/);
-          const players = match ? match[1].split(', ') : [];
-          document.getElementById('playerList').innerHTML = players.map(p => `<span>${getRandomEmoji()} ${p}</span>`).join('');
+        if (res.ok) {
+          output.textContent = 'Server online\nJucători: ' + data.players;
         } else {
-          document.getElementById('serverStatus').innerHTML = '❌ Offline';
+          output.textContent = 'Server offline sau eroare: ' + data.error;
         }
       } catch (e) {
-        document.getElementById('serverStatus').innerHTML = '⚠️ Error connecting to server';
+        output.textContent = 'Nu se poate conecta la backend.';
       }
     }
 
     async function sendCommand() {
-      const cmd = document.getElementById('commandInput').value;
-      if (!cmd) return;
-      await quickCommand(cmd);
-    }
+      const command = commandInput.value.trim();
+      if (!command) return;
 
-    async function quickCommand(cmd) {
+      output.textContent += `\n> ${command}`;
+
       try {
-        const res = await fetch('http://localhost:3000/api/command', {
+        const res = await fetch('/api/command', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ command: cmd }),
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ command }),
         });
+
         const data = await res.json();
-        document.getElementById('consoleOutput').textContent += `> ${cmd}\n${data.result || data.error}\n\n`;
-      } catch (err) {
-        document.getElementById('consoleOutput').textContent += `> ${cmd}\n❌ ${err.message}\n\n`;
+
+        if (res.ok) {
+          output.textContent += `\n${data.result}`;
+        } else {
+          output.textContent += `\nEroare: ${data.error}`;
+        }
+      } catch (e) {
+        output.textContent += '\nEroare la trimiterea comenzii.';
       }
+
+      commandInput.value = '';
+      output.scrollTop = output.scrollHeight;
     }
 
-    fetchStatus();
-    setInterval(fetchStatus, 10000);
+    // La încărcarea paginii verificăm statusul serverului
+    updateStatus();
   </script>
 
 </body>
